@@ -13,7 +13,6 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 #define _CRT_SECURE_NO_WARNINGS
 #include <cstdio>
 #include <cassert>
@@ -21,14 +20,18 @@
 #include <vector>
 #include "ispc_texcomp.h"
 
+#include "CArgs.h"
+
+using namespace ispccomp;
+
 size_t align(size_t bytes, const int alignement)
 {
     return (bytes + alignement - 1) & ~(alignement - 1);
 }
 
-void load_bmp(rgba_surface* img, char* filename)
+void load_bmp(rgba_surface* img, string filename)
 {
-    FILE* f = fopen(filename, "rb");
+    FILE* f = fopen(filename.c_str(), "rb");
     assert(f && "load_bmp: couldn't open file");
 
     BITMAPFILEHEADER file_header;
@@ -88,9 +91,9 @@ struct astc_header
     uint8_t zsize[3];			// block count is inferred
 };
 
-void store_astc(rgba_surface* img, int block_width, int block_height, char* filename)
+void store_astc(rgba_surface* img, int block_width, int block_height, string filename)
 {
-    FILE* f = fopen(filename, "wb");
+    FILE* f = fopen(filename.c_str(), "wb");
 
     astc_header file_header;
 
@@ -180,7 +183,8 @@ void fill_borders(rgba_surface* dst, rgba_surface* src, int block_width, int blo
     ReplicateBorders(dst, src, 0, 0, 32);
 }
 
-void enc_astc_file(char* filename, char* dst_filename)
+//void enc_astc_file(char* filename, char* dst_filename)
+void enc_astc_file(string filename, string dst_filename)
 {
     rgba_surface src_img;
     load_bmp(&src_img, filename);
@@ -198,7 +202,7 @@ void enc_astc_file(char* filename, char* dst_filename)
     rgba_surface edged_img;
     fill_borders(&edged_img, &src_img, block_width, block_height);
 
-    printf("encoding <%s>...", filename);
+    printf("encoding <%s>...", filename.c_str());
 
     compress_astc_tex(&output_tex, &edged_img, block_width, block_height);
 
@@ -212,9 +216,11 @@ void enc_astc_file(char* filename, char* dst_filename)
 //-----------------------------------------------------------------------------------------
 void main(int argc, char *argv[])
 {
-    if (argc == 3)
+    CArgs args(argc, argv);
+
+    if (args.IsValid())//argc == 3)
     {
-        enc_astc_file(argv[1], argv[2]);
+        enc_astc_file(args.GetInputPath(), args.GetOutputPath()); //         argv[1], argv[2]);
     }
     else
     {

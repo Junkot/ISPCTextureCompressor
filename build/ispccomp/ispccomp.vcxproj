@@ -120,6 +120,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CArgs.cpp" />
     <ClCompile Include="ispccomp.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -129,6 +130,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\ispc_texcomp\ispc_texcomp.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CArgs.h" />
+    <ClInclude Include="format.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
