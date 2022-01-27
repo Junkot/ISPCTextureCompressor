@@ -1,6 +1,10 @@
 #ifndef __FORMAT_H
 #define __FORMAT_H
 
+#include <string>
+
+using namespace std;
+
 //------------------------------------------------------------------------
 // format.h
 //------------------------------------------------------------------------
@@ -10,8 +14,8 @@ namespace ispccomp {
 
 enum class IMAGE_FORMAT : int
 {
-	NONE,
-	ASTC_4x4,
+	NONE = -1,
+	ASTC_4x4 = 0,
 	ASTC_5x4,
 	ASTC_5x5,
 	ASTC_6x5,
@@ -20,6 +24,30 @@ enum class IMAGE_FORMAT : int
 	ASTC_8x6,
 	ASTC_8x8,
 };
+
+static const char* IMAGE_FORMAT_STR[] =
+{
+	"astc_4x4",
+	"astc_5x4",
+	"astc_5x5",
+	"astc_6x5",
+	"astc_6x6",
+	"astc_8x5",
+	"astc_8x6",
+	"astc_8x8",
+};
+
+inline IMAGE_FORMAT GetImageFormat(string fmt)
+{
+	for (int i = 0; i < size(IMAGE_FORMAT_STR); i++)
+	{
+		if (fmt.compare(IMAGE_FORMAT_STR[i]) == 0)
+		{
+			return static_cast<IMAGE_FORMAT>(i);
+		}
+	}
+	return IMAGE_FORMAT::NONE;
+}
 
 inline int GetBlockW(IMAGE_FORMAT fmt)
 {

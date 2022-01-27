@@ -218,13 +218,13 @@ void main(int argc, char *argv[])
 {
     CArgs args(argc, argv);
 
-    if (args.IsValid())//argc == 3)
+    if (args.IsValid())
     {
-        enc_astc_file(args.GetInputPath(), args.GetOutputPath()); //         argv[1], argv[2]);
+        enc_astc_file(args.GetInputPath(), args.GetOutputPath());
     }
     else
     {
-        printf("usage:\nastccomp input.bmp output.astc\n");
+        args.Usage();
     }
 }
 
