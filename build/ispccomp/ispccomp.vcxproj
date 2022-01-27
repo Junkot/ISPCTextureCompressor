@@ -121,6 +121,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CArgs.cpp" />
+    <ClCompile Include="CAstcWriter.cpp" />
+    <ClCompile Include="CImageWriter.cpp" />
     <ClCompile Include="ispccomp.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -133,6 +135,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CArgs.h" />
+    <ClInclude Include="CAstcWriter.h" />
+    <ClInclude Include="CImageWriter.h" />
     <ClInclude Include="filepath.h" />
     <ClInclude Include="format.h" />
   </ItemGroup>

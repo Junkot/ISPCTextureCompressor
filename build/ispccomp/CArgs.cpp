@@ -35,7 +35,7 @@ string CArgs::ParseInputPath(int argc, char* argv[])
 	if (argc >= 2)
 	{
 		string path = argv[argc - 1];
-		if (GetImageType(path) != IMAGE_TYPE::NONE)
+		if (GetInputType(path) != INPUT_TYPE::NONE)
 		{
 			ifstream ifs(path);
 			if (ifs.is_open())
@@ -53,7 +53,7 @@ string CArgs::ParseOutputPath(int argc, char* argv[])
 	string path = ParseOptionString(argc, argv, "-o", "--outputPath");
 	if (path.empty())
 	{
-		return GetPathWithoutExt(m_inputPath) + ".dds";
+		return GetPathWithoutExt(m_inputPath) + ".astc";
 	}
 	return path;
 }

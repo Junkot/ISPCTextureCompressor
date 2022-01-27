@@ -34,7 +34,8 @@ public:
 	bool IsValid() { return m_valid; }
 	string GetInputPath() { return m_inputPath; };
 	string GetOutputPath() { return m_outputPath; };
-
+	int GetBlockW() { return ispccomp::GetBlockW(m_format); };
+	int GetBlockH() { return ispccomp::GetBlockH(m_format); };
 	static void Usage();
 };
 

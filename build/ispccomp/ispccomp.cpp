@@ -21,6 +21,7 @@
 #include "ispc_texcomp.h"
 
 #include "CArgs.h"
+#include "CImageWriter.h"
 
 using namespace ispccomp;
 
@@ -73,48 +74,6 @@ void load_bmp(rgba_surface* img, string filename)
             img->ptr[yy * img->stride + x * 4 + 3] = raw_line[x * bytePerPixel + 3];
         }
     }
-
-    fclose(f);
-}
-
-#define MAGIC_FILE_CONSTANT 0x5CA1AB13
-
-// little endian
-struct astc_header
-{
-    uint8_t magic[4];
-    uint8_t blockdim_x;
-    uint8_t blockdim_y;
-    uint8_t blockdim_z;
-    uint8_t xsize[3];
-    uint8_t ysize[3];			// x-size, y-size and z-size are given in texels;
-    uint8_t zsize[3];			// block count is inferred
-};
-
-void store_astc(rgba_surface* img, int block_width, int block_height, string filename)
-{
-    FILE* f = fopen(filename.c_str(), "wb");
-
-    astc_header file_header;
-
-    uint32_t magic = MAGIC_FILE_CONSTANT;
-    memcpy(file_header.magic, &magic, 4);
-    file_header.blockdim_x = block_width;
-    file_header.blockdim_y = block_height;
-    file_header.blockdim_z = 1;
-
-    int xsize = img->width;
-    int ysize = img->height;
-    int zsize = 1;
-
-    memcpy(file_header.xsize, &xsize, 3);
-    memcpy(file_header.ysize, &ysize, 3);
-    memcpy(file_header.zsize, &zsize, 3);
-
-    fwrite(&file_header, sizeof(astc_header), 1, f);
-
-    size_t height_in_blocks = (block_height + img->height - 1) / block_height;
-    fwrite(img->ptr, height_in_blocks * img->stride, 1, f);
 
     fclose(f);
 }
@@ -184,25 +143,27 @@ void fill_borders(rgba_surface* dst, rgba_surface* src, int block_width, int blo
 }
 
 //void enc_astc_file(char* filename, char* dst_filename)
-void enc_astc_file(string filename, string dst_filename)
+void enc_astc_file(CArgs& args)
 {
     rgba_surface src_img;
-    load_bmp(&src_img, filename);
+    load_bmp(&src_img, args.GetInputPath());
     flip_image(&src_img);
 
-    int block_width = 6;
-    int block_height = 6;
+    int block_width = args.GetBlockW();
+    int block_height = args.GetBlockH();
 
     rgba_surface output_tex;
     output_tex.width = idiv_ceil(src_img.width, block_width);
     output_tex.height = idiv_ceil(src_img.height, block_height);
     output_tex.stride = output_tex.width * 16;
-    output_tex.ptr = (uint8_t*)malloc(output_tex.height * output_tex.stride);
 
+    size_t h = output_tex.height;
+    size_t stride = output_tex.stride;
+    output_tex.ptr = (uint8_t*)malloc(h * stride);
     rgba_surface edged_img;
     fill_borders(&edged_img, &src_img, block_width, block_height);
 
-    printf("encoding <%s>...", filename.c_str());
+    printf("encoding <%s>...", args.GetInputPath().c_str());
 
     compress_astc_tex(&output_tex, &edged_img, block_width, block_height);
 
@@ -210,7 +171,7 @@ void enc_astc_file(string filename, string dst_filename)
 
     output_tex.width = src_img.width;
     output_tex.height = src_img.height;
-    store_astc(&output_tex, block_width, block_height, dst_filename);
+    CImageWriter::Save(&output_tex, block_width, block_height, args.GetOutputPath());
 }
 
 //-----------------------------------------------------------------------------------------
@@ -220,7 +181,7 @@ void main(int argc, char *argv[])
 
     if (args.IsValid())
     {
-        enc_astc_file(args.GetInputPath(), args.GetOutputPath());
+        enc_astc_file(args);
     }
     else
     {
